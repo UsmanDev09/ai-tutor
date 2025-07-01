@@ -188,8 +188,11 @@ export function AICourseContent({
     ? (typeof currentLesson === "string" ? currentLesson : currentLesson?.title || "Untitled Lesson")
     : ""
 
-  dispatch(setCurrentLessonTitle(lessonTitle))
-  dispatch(setCurrentLessonContent(currentLesson?.content || ''))
+useEffect(() => {
+  dispatch(setCurrentLessonTitle(lessonTitle));
+  dispatch(setCurrentLessonContent(currentLesson?.content || ''));
+}, [lessonTitle, currentLesson?.content, dispatch]);
+
   const handleSelectLesson = async (moduleIndex: number, lessonIndex: number) => {
     setSelectedModuleIndex(moduleIndex)
     setSelectedLessonIndex(lessonIndex)

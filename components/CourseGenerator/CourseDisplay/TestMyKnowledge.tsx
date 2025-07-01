@@ -28,7 +28,7 @@ const TestMyKnowledge: React.FC<TestMyKnowledgeProps> = ({ lessonContent }) => {
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasGenerated, setHasGenerated] = useState(false);
+  // const [hasGenerated, setHasGenerated] = useState(false);
   const [quizComplete, setQuizComplete] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [allQuestionsAnswered, setAllQuestionsAnswered] = useState(false);
@@ -83,13 +83,43 @@ const TestMyKnowledge: React.FC<TestMyKnowledgeProps> = ({ lessonContent }) => {
       setIsLoading(false);
     }
   });
-  useEffect(() => {
-    if (!hasGenerated) {
-      setHasGenerated(true);
-      setIsLoading(true);
-      complete('');
-    }
-  }, [hasGenerated, complete]);
+// useEffect(() => {
+//   if (!lessonContent || lessonContent.trim() === "") return;
+
+//   if (!hasGenerated) {
+//     setHasGenerated(true);
+//     setIsLoading(true);
+//     complete('');
+//   }
+// }, [hasGenerated, complete, lessonContent]);
+useEffect(() => {
+  if (!lessonContent || lessonContent.trim() === "") return;
+
+  // Reset state
+  setQuestions([]);
+  setAnswers([]);
+  setError(null);
+  setIsLoading(true);
+  setQuizComplete(false);
+  setScore(null);
+  setReviewMode(false);
+  setShowSuggestions(false);
+
+  // Generate quiz
+  const timeout = setTimeout(() => {
+    complete('', {
+      body: {
+        content: lessonContent,
+        type: 'mcq',
+        lang,
+      },
+    });
+  }, 100);
+
+  return () => clearTimeout(timeout);
+}, [lessonContent, lang]);
+
+
 
   useEffect(() => {
     if (answers.length > 0 && questions.length > 0) {
@@ -238,7 +268,7 @@ const TestMyKnowledge: React.FC<TestMyKnowledgeProps> = ({ lessonContent }) => {
             className="mt-4 bg-purple-500 text-white px-4 py-2 rounded-lg"
             onClick={() => {
               setError(null);
-              setHasGenerated(false);
+              // setHasGenerated(false);
             }}
           >
             Try Again

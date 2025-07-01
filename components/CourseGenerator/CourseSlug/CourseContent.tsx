@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl"
 import { parseContentFromMarkdown } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { FlaskConical } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import TestMyKnowledge from "../CourseDisplay/TestMyKnowledge"
 import { ChatButton } from "../CourseControls/ChatButton"
 import FAQs from "./Faqs"
@@ -74,11 +74,15 @@ export function CourseContent({
   const faqs = extractFAQsFromMarkdown(lessonContent)
 
   // Remove FAQ from lesson content before parsing markdown
-const contentWithoutFAQ = lessonContent.split(/(##?\s*)?(FAQs|FAQ|Frequently Asked Questions|Common Questions)/i)[0];
+  const contentWithoutFAQ = lessonContent.split(/(##?\s*)?(FAQs|FAQ|Frequently Asked Questions|Common Questions)/i)[0];
 
 
   // Convert markdown to HTML
   const parsedContent = parseContentFromMarkdown(contentWithoutFAQ)
+
+  useEffect(() => {
+    setTestMyKnowledgeToggle(false); // hide the quiz when lesson changes
+  }, [lessonContent]);
 
   if (lessonError) {
     return (
@@ -126,17 +130,22 @@ const contentWithoutFAQ = lessonContent.split(/(##?\s*)?(FAQs|FAQ|Frequently Ask
       </div>
 
       {!isLoadingLesson && (
-        testMyKnowledgeToggle ? (
+        testMyKnowledgeToggle && lessonContent?.trim() ? (
           <div className="mt-12">
-            <TestMyKnowledge lessonContent={lessonContent} />
+            <TestMyKnowledge key={lessonContent} lessonContent={lessonContent} />
           </div>
         ) : (
-          <Button variant="default" onClick={handleTestMyKnowledgeToggle}>
+          <Button
+            variant="default"
+            disabled={!lessonContent.trim()}
+            onClick={handleTestMyKnowledgeToggle}
+          >
             <FlaskConical className="mr-2" />
             {t('lesson-content.testKnowledgeButton')}
           </Button>
         )
       )}
+
 
       {faqs.length > 0 && (
         <div className="mt-10">
